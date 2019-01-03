@@ -4,6 +4,7 @@
   "private": true,
   "description": "bouncing DVD logo app",
   "main": "main.js",
+  "repository": {"url": "git@github.com:pawel-majczyk/dvd-screener.git"},
   "author": "Paweł Majczyk <pawel.majczyk@gmail.com>",
   "keywords": ["DVD", "fun", "screensaver", "The Office"],
   "license": "ISC",
