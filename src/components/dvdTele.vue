@@ -17,10 +17,10 @@ export default {
     return {
       imageLogo,
       logoPosition: { x: 0, y: 0 },
-      logoVelocity: { x: 1, y: 1 },
+      logoVelocity: { x: 166, y: 166 },
       imageSize: { width: 150, height: 150 },
       time: {
-        now: Date.now(),
+        now: Date.now() / 1000,
         then: null,
         dt: null,
         total: 0,
@@ -42,8 +42,9 @@ export default {
   },
   methods: {
     gameSetup() {
-      this.$refs.canvas.addEventListener('click', this.step);
+      // this.$refs.canvas.addEventListener('click', this.run);
       this.logoPosition = this.imageRandomPosition();
+      this.step();
     },
     renderImage(image, position, context) {
       const logo = new Image();
@@ -65,15 +66,16 @@ export default {
         y: Math.ceil(Math.random() * (this.$refs.canvas.height - img.y)),
       });
     },
-    updateLogoPositon(pos = { x: 0, y: 0 }) {
-      this.logoPosition = pos;
-    },
     updateState() {
+      const updateLogoPositon = (pos = { x: 0, y: 0 }) => {
+        this.logoPosition = pos;
+      };
+
       // dlaczego nie działa poniżej this.imageSize.x (=150)
-      if (this.logoPosition.x > this.canvasDimensions.width - 150) {
+      if (this.logoPosition.x > this.canvasDimensions.width - this.imageSize.width) {
         this.logoVelocity.x = this.logoVelocity.x * -1;
       }
-      if (this.logoPosition.y > this.canvasDimensions.height - 150) {
+      if (this.logoPosition.y > this.canvasDimensions.height - this.imageSize.height) {
         this.logoVelocity.y = this.logoVelocity.y * -1;
       }
 
@@ -84,33 +86,40 @@ export default {
         this.logoVelocity.y = this.logoVelocity.y * -1;
       }
       const newPos = {
-        x: this.logoPosition.x + this.logoVelocity.x,
-        y: this.logoPosition.y + this.logoVelocity.y,
+        x: this.logoPosition.x + this.logoVelocity.x * this.time.dt,
+        y: this.logoPosition.y + this.logoVelocity.y * this.time.dt,
       };
-      this.updateLogoPositon(newPos);
+      updateLogoPositon(newPos);
     },
     renderState() {
-      this.clearCanvas();
+      // this.ctx.clearRect(this.logoPosition.x - 1, this.logoPosition.y - 1, 150, 1);
+      // this.ctx.clearRect(this.logoPosition.x - 1, this.logoPosition.y - 1, 1, 150);
+
+
+      // gowno nie dziala!!!! Tzn działa za dobrze - usuwa nawet to, co jeszcze nie jest narysowane
+      // this.clearCanvas();
+
       this.renderImage(this.imageLogo, this.logoPosition, this.ctx);
     },
-    step() { // TODO: dt (delta time) will be passed here
+
+    step() {
+      this.time.then = this.time.now;
+      this.time.total += this.time.dt;
+
       this.updateState();
       this.renderState();
 
-      setTimeout(() => { // TODO: switch to .requestanimationframe()
-        this.step();
-      }, 5);
-      // requestAnimationFrame(this.step);
+      this.time.now = Date.now() / 1000;
+      this.time.dt = this.time.now - this.time.then;
+      requestAnimationFrame(this.step);
     },
   },
   mounted() {
     this.gameSetup();
-    this.time.now = Date.now();
   },
 };
 
 </script>
-
 <style scoped>
 #gameCanvas {
   border: 2px solid #BBB;
