@@ -23,12 +23,23 @@ export default {
 
 
 <style lang="scss">
+* {
+  margin: 0;
+  padding: 0;
+}
+html, body {
+  height: 100%;
+};
 body {
   color: #fff;
   background-color: #1d1d1f;
 }
+
 #app {
+  // flex: 1;
   width: 100%;
   height: 100%;
 }
+
+nav { display: none;}
 </style>

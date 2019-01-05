@@ -3,8 +3,6 @@
     <canvas
       ref="canvas"
       id="gameCanvas"
-      width="800"
-      height="600"
     />
   </div>
 </template>
@@ -17,8 +15,9 @@ export default {
     return {
       imageLogo,
       logoPosition: { x: 0, y: 0 },
-      logoVelocity: { x: 166, y: 166 },
-      imageSize: { width: 150, height: 150 },
+      logoVelocity: { x: 140, y: 140 },
+      loadedImage: new Image(),
+      imageSize: { width: 250, height: 250 },
       time: {
         now: Date.now() / 1000,
         then: null,
@@ -42,20 +41,33 @@ export default {
   },
   methods: {
     gameSetup() {
-      // this.$refs.canvas.addEventListener('click', this.run);
+      this.adjustResolution();
       this.logoPosition = this.imageRandomPosition();
+      this.preloadImage();
       this.step();
     },
-    renderImage(image, position, context) {
-      const logo = new Image();
-      logo.src = image;
-      logo.addEventListener('load', () => context.drawImage(
-        logo,
-        position.x,
-        position.y,
-        this.imageSize.width,
-        this.imageSize.height,
-      ));
+    adjustResolution() {
+      // canvas
+      this.$refs.canvas.width = Math.max(
+        document.documentElement.clientWidth, window.innerWidth || 0,
+      );
+      this.$refs.canvas.height = Math.max(
+        document.documentElement.clientHeight, window.innerHeight || 0,
+      );
+      this.canvasDimensions.width = this.$refs.canvas.width;
+      this.canvasDimensions.height = this.$refs.canvas.height;
+
+      // image size proportions
+      this.imageSize.width = this.canvasDimensions.height / 100 * 25;
+      this.imageSize.height = this.canvasDimensions.height / 100 * 25;
+    },
+    preloadImage() {
+      this.loadedImage = new Image();
+      this.loadedImage.src = this.imageLogo;
+      this.loadedImage.addEventListener('load', () => {
+        this.step();
+        return undefined;
+      });
     },
     clearCanvas() {
       this.ctx.clearRect(0, 0, this.canvasDimensions.width, this.canvasDimensions.height);
@@ -71,35 +83,35 @@ export default {
         this.logoPosition = pos;
       };
 
-      // dlaczego nie działa poniżej this.imageSize.x (=150)
-      if (this.logoPosition.x > this.canvasDimensions.width - this.imageSize.width) {
-        this.logoVelocity.x = this.logoVelocity.x * -1;
+      if (this.logoPosition.x > this.canvasDimensions.width - this.imageSize.width
+        && this.logoVelocity.x < 0) {
+        this.logoVelocity.x *= -1;
       }
-      if (this.logoPosition.y > this.canvasDimensions.height - this.imageSize.height) {
+      if (this.logoPosition.y > this.canvasDimensions.height - this.imageSize.height
+        && this.logoVelocity.y < 0) {
         this.logoVelocity.y = this.logoVelocity.y * -1;
       }
-
-      if (this.logoPosition.x < 0) {
+      if (this.logoPosition.x < 0
+        && this.logoVelocity.x > 0) {
         this.logoVelocity.x = this.logoVelocity.x * -1;
       }
-      if (this.logoPosition.y < 0) {
+      if (this.logoPosition.y < 0
+        && this.logoVelocity.y > 0) {
         this.logoVelocity.y = this.logoVelocity.y * -1;
       }
       const newPos = {
-        x: this.logoPosition.x + this.logoVelocity.x * this.time.dt,
-        y: this.logoPosition.y + this.logoVelocity.y * this.time.dt,
+        x: this.logoPosition.x - this.logoVelocity.x * this.time.dt,
+        y: this.logoPosition.y - this.logoVelocity.y * this.time.dt,
       };
       updateLogoPositon(newPos);
     },
     renderState() {
-      // this.ctx.clearRect(this.logoPosition.x - 1, this.logoPosition.y - 1, 150, 1);
-      // this.ctx.clearRect(this.logoPosition.x - 1, this.logoPosition.y - 1, 1, 150);
-
-
-      // gowno nie dziala!!!! Tzn działa za dobrze - usuwa nawet to, co jeszcze nie jest narysowane
-      // this.clearCanvas();
-
-      this.renderImage(this.imageLogo, this.logoPosition, this.ctx);
+      this.adjustResolution();
+      this.clearCanvas();
+      this.ctx.drawImage(this.loadedImage,
+        this.logoPosition.x, this.logoPosition.y,
+        this.imageSize.width, this.imageSize.height);
+      // 0, 0, 64, 64);
     },
 
     step() {
@@ -121,10 +133,14 @@ export default {
 
 </script>
 <style scoped>
+div {
+  width: 100%;
+  height: 100%;
+}
 #gameCanvas {
-  border: 2px solid #BBB;
-  width: 800px;
-  height: 600px;
+  /* border: 2px solid #BBB; */
+  width: 100%;
+  height: 100%;
   display: block;
   margin: 0 auto;
   cursor: crosshair;
