@@ -9,14 +9,14 @@
 
 <script>
 import imageLogo from '../assets/dvd-logo.png';
-import { hslToRgb, rgbToHsl } from '../helpers/bitmapMod';
+// import { hslToRgb, rgbToHsl } from '../helpers/bitmapMod';
 
 export default {
   data() {
     return {
       imageLogo,
-      logoPosition: { x: 0, y: 0 },
-      logoVelocity: { x: 140, y: 140 },
+      imagePosition: { x: 0, y: 0 },
+      imageVelocity: { x: 200, y: 200 },
       loadedImage: new Image(),
       imageSize: { width: 250, height: 250 },
       time: {
@@ -41,12 +41,12 @@ export default {
     },
   },
   methods: {
-    gameSetup() {
+    screensaverSetup() {
       this.adjustResolution();
-      this.logoPosition = this.imageRandomPosition();
+      this.imagePosition = this.imageRandomPosition();
       this.preloadImage();
-      this.step();
     },
+
     adjustResolution() {
       // canvas
       this.$refs.canvas.width = Math.max(
@@ -62,6 +62,7 @@ export default {
       this.imageSize.width = this.canvasDimensions.height / 100 * 25;
       this.imageSize.height = this.canvasDimensions.height / 100 * 25;
     },
+
     preloadImage() {
       this.loadedImage = new Image();
       this.loadedImage.src = this.imageLogo;
@@ -70,51 +71,80 @@ export default {
         return undefined;
       });
     },
-    clearCanvas() {
-      this.ctx.clearRect(0, 0, this.canvasDimensions.width, this.canvasDimensions.height);
-    },
+
     imageRandomPosition(img = { x: 250, y: 250 }) {
       return ({
         x: Math.ceil(Math.random() * (this.$refs.canvas.width - img.x)),
         y: Math.ceil(Math.random() * (this.$refs.canvas.height - img.y)),
       });
     },
+
+    checkForBounce(pos, size, velocity) {
+      const newVelocity = {
+        x: velocity.x,
+        y: velocity.y,
+      };
+      if (pos.x > this.canvasDimensions.width - size.width
+        && velocity.x < 0) {
+        newVelocity.x = velocity.x * -1;
+        this.switchColor();
+      }
+      if (pos.y > this.canvasDimensions.height - size.height
+        && velocity.y < 0) {
+        newVelocity.y = velocity.y * -1;
+        this.switchColor();
+      }
+      if (pos.x < 0
+        && velocity.x > 0) {
+        newVelocity.x = velocity.x * -1;
+        this.switchColor();
+      }
+      if (pos.y < 0
+        && velocity.y > 0) {
+        newVelocity.y = velocity.y * -1;
+        this.switchColor();
+      }
+      return { x: newVelocity.x, y: newVelocity.y };
+    },
+
+    async switchColor() {
+      const imgData = this.ctx.getImageData(this.imagePosition.x, this.imagePosition.y,
+        this.imageSize.width, this.imageSize.height);
+      const { data } = imgData;
+      for (let i = 0; i < data.length; i += 4) {
+        // replace channels
+        const colorSw = [data[i], data[i + 1], data[i + 2]];
+        [data[i + 1], data[i + 2], data[i]] = [...colorSw];
+        // const HSL = rgbToHsl(data[i], data[i + 1], data[i + 2]);
+        // const RGB = hslToRgb(HSL[0], HSL[1], HSL[2]);
+        // [data[i + 1], data[i + 2], data[i + 0]] = [...RGB];
+      }
+      this.loadedImage = await createImageBitmap(imgData);
+    },
+
+    clearCanvas() {
+      this.ctx.clearRect(0, 0, this.canvasDimensions.width, this.canvasDimensions.height);
+    },
+
     updateState() {
       const updateLogoPositon = (pos = { x: 0, y: 0 }) => {
-        this.logoPosition = pos;
+        this.imagePosition = pos;
       };
+      this.imageVelocity = this.checkForBounce(this.imagePosition,
+        this.imageSize, this.imageVelocity);
 
-      if (this.logoPosition.x > this.canvasDimensions.width - this.imageSize.width
-        && this.logoVelocity.x < 0) {
-        this.logoVelocity.x *= -1;
-        this.switchColor();
-      }
-      if (this.logoPosition.y > this.canvasDimensions.height - this.imageSize.height
-        && this.logoVelocity.y < 0) {
-        this.logoVelocity.y = this.logoVelocity.y * -1;
-        this.switchColor();
-      }
-      if (this.logoPosition.x < 0
-        && this.logoVelocity.x > 0) {
-        this.logoVelocity.x = this.logoVelocity.x * -1;
-        this.switchColor();
-      }
-      if (this.logoPosition.y < 0
-        && this.logoVelocity.y > 0) {
-        this.logoVelocity.y = this.logoVelocity.y * -1;
-        this.switchColor();
-      }
       const newPos = {
-        x: this.logoPosition.x - this.logoVelocity.x * this.time.dt,
-        y: this.logoPosition.y - this.logoVelocity.y * this.time.dt,
+        x: this.imagePosition.x - this.imageVelocity.x * this.time.dt,
+        y: this.imagePosition.y - this.imageVelocity.y * this.time.dt,
       };
       updateLogoPositon(newPos);
     },
+
     renderState() {
       this.adjustResolution();
       this.clearCanvas();
       this.ctx.drawImage(this.loadedImage,
-        this.logoPosition.x, this.logoPosition.y,
+        this.imagePosition.x, this.imagePosition.y,
         this.imageSize.width, this.imageSize.height);
       // 0, 0, 64, 64);
     },
@@ -130,20 +160,9 @@ export default {
       this.time.dt = this.time.now - this.time.then;
       requestAnimationFrame(this.step);
     },
-    async switchColor() {
-      const imgData = this.ctx.getImageData(this.logoPosition.x, this.logoPosition.y,
-        this.imageSize.width, this.imageSize.height);
-      const { data } = imgData;
-      for (let i = 0; i < data.length; i += 4) {
-        const HSL = rgbToHsl(data[i], data[i + 1], data[i + 2]);
-        const RGB = hslToRgb(HSL[0], HSL[1], HSL[2]);
-        [data[i + 1], data[i + 2], data[i + 0]] = [...RGB];
-      }
-      this.loadedImage = await createImageBitmap(imgData);
-    },
   },
   mounted() {
-    this.gameSetup();
+    this.screensaverSetup();
   },
 };
 

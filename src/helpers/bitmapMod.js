@@ -1,4 +1,4 @@
-/* eslint-disable no-param-reassign */
+/* eslint-disable */
 // TODO: bitmap manipulation
 /**
  * Converts an HSL color value to RGB. Conversion formula
@@ -16,7 +16,6 @@ export function hslToRgb(h, s, l) {
     b;
 
   if (s === 0) {
-    // eslint-disable-next-line no-multi-assign
     r = g = b = l; // achromatic
   } else {
     const hue2rgb = function hue2rgb(p, q, t) {
@@ -56,12 +55,10 @@ export function rgbToHsl(r, g, b) {
     l = (max + min) / 2;
 
   if (max === min) {
-    // eslint-disable-next-line no-multi-assign
     h = s = 0; // achromatic
   } else {
     const d = max - min;
     s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
-    // eslint-disable-next-line default-case
     switch (max) {
       case r: h = (g - b) / d + (g < b ? 6 : 0); break;
       case g: h = (b - r) / d + 2; break;
