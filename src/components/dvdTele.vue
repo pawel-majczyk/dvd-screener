@@ -9,6 +9,7 @@
 
 <script>
 import imageLogo from '../assets/dvd-logo.png';
+import { hslToRgb, rgbToHsl } from '../helpers/bitmapMod';
 
 export default {
   data() {
@@ -86,18 +87,22 @@ export default {
       if (this.logoPosition.x > this.canvasDimensions.width - this.imageSize.width
         && this.logoVelocity.x < 0) {
         this.logoVelocity.x *= -1;
+        this.switchColor();
       }
       if (this.logoPosition.y > this.canvasDimensions.height - this.imageSize.height
         && this.logoVelocity.y < 0) {
         this.logoVelocity.y = this.logoVelocity.y * -1;
+        this.switchColor();
       }
       if (this.logoPosition.x < 0
         && this.logoVelocity.x > 0) {
         this.logoVelocity.x = this.logoVelocity.x * -1;
+        this.switchColor();
       }
       if (this.logoPosition.y < 0
         && this.logoVelocity.y > 0) {
         this.logoVelocity.y = this.logoVelocity.y * -1;
+        this.switchColor();
       }
       const newPos = {
         x: this.logoPosition.x - this.logoVelocity.x * this.time.dt,
@@ -124,6 +129,17 @@ export default {
       this.time.now = Date.now() / 1000;
       this.time.dt = this.time.now - this.time.then;
       requestAnimationFrame(this.step);
+    },
+    async switchColor() {
+      const imgData = this.ctx.getImageData(this.logoPosition.x, this.logoPosition.y,
+        this.imageSize.width, this.imageSize.height);
+      const { data } = imgData;
+      for (let i = 0; i < data.length; i += 4) {
+        const HSL = rgbToHsl(data[i], data[i + 1], data[i + 2]);
+        const RGB = hslToRgb(HSL[0], HSL[1], HSL[2]);
+        [data[i + 1], data[i + 2], data[i + 0]] = [...RGB];
+      }
+      this.loadedImage = await createImageBitmap(imgData);
     },
   },
   mounted() {
