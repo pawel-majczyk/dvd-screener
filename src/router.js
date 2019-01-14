@@ -3,6 +3,7 @@ import Router from 'vue-router';
 // import dvdHome from './views/dvdHome.vue';
 import dvdTele from './components/dvdTele.vue';
 import _3Dcomponent from './components/three.vue';
+import dvd from './components/dvd.vue';
 
 Vue.use(Router);
 
@@ -17,6 +18,11 @@ export default new Router({
       path: '/three',
       name: 'three',
       component: _3Dcomponent,
+    },
+    {
+      path: '/dvd',
+      name: 'dvd',
+      component: dvd,
     },
     {
       path: '/about',
