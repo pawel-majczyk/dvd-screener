@@ -1,5 +1,5 @@
 # dvd-screener
-In future, there will be working version of common DVD Screensaver.
+In future, there will be working version of common DVD Screensaver
 
 Should be a great resource on daily meetings/talks that get out of hand.
 
