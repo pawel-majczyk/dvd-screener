@@ -7,9 +7,8 @@ Inspiration: https://www.youtube.com/watch?v=QOtuX0jL85Y
 
 ### links
 
-https://pawel-majczyk.github.io/dvd-screener/#/
-
-https://pawel-majczyk.github.io/dvd-screener/#/three (3D playground)
++ https://pawel-majczyk.github.io/dvd-screener/#/
++ https://pawel-majczyk.github.io/dvd-screener/#/three (3D playground)
 
 
 ## Project setup
