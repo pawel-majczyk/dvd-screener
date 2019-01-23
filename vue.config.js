@@ -1,6 +1,6 @@
 module.exports = {
-  baseUrl: undefined,
-  outputDir: undefined,
+  outputDir: './dist/',
+  baseUrl: './',
   assetsDir: 'assets',
   runtimeCompiler: undefined,
   productionSourceMap: undefined,
