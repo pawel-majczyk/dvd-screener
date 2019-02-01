@@ -1,15 +1,14 @@
 <template>
-  <dvdTele />
+  <DVDScreensaver />
 </template>
 
 <script>
-// @ is an alias to /src
-import dvdTele from '../components/dvdTele.vue';
+import DVDScreensaver from '../components/DVDScreensaver.vue';
 
 export default {
-  name: 'DvdTele',
+  name: 'Screensaver',
   components: {
-    dvdTele,
+    DVDScreensaver,
   },
 };
 </script>
