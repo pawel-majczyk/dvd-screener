@@ -1,6 +1,6 @@
 <template>
   <canvas
-    ref="canvas"
+    ref="view"
   />
 </template>
 <script>
@@ -13,12 +13,27 @@ export default {
     };
   },
   mounted() {
-    const { canvas } = this.$refs;
+    const { view } = this.$refs;
+    const { width, height } = view.getBoundingClientRect();
     this.game = new Screensaver({
-      canvas,
-      width: canvas.width,
-      height: canvas.height,
+      view,
+      width,
+      height,
+      // PIXI.settings.RESOLUTIOn
+      // width: 128 + 128 * Math.floor(width / 128),
+      // height: 128 + 128 * Math.floor(height / 128),
+      backgroundColor: 0x111b16,
+      antialias: true,
     });
+  },
+  updated() {
+    const { width, height } = this.$refs.view.getBoundingClientRect();
+    console.log('i[dated');
+
+    this.game.setSize({ width, height });
+  },
+  destroyed() {
+    this.game.destroy();
   },
 };
 
@@ -27,7 +42,6 @@ export default {
 <style>
 canvas {
   box-sizing: border-box;
-  border: 1px dashed grey;
   display: block;
   margin: 0 auto;
   width: 100%;
