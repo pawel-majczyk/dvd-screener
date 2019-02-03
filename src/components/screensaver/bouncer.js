@@ -4,21 +4,63 @@ import logo from '../../assets/dvd-logo.png';
 export default class Bouncer extends PIXI.Container {
   constructor(origin, options) {
     super(options);
-    this.velocity = 1;
+
+    this.velocity = {
+      x: 2,
+      y: 2,
+    };
 
     this.sprite = PIXI.Sprite.from(logo);
-    this.sprite.width = origin.screen.width / 10;
-    this.sprite.height = origin.screen.width / 10;
-    this.sprite.position.x = Math.random()
-      * origin.screen.width - this.sprite.width / 2;
-    this.sprite.position.y = Math.random()
-      * origin.screen.height - this.sprite.height / 2;
+    const spriteSize = origin.screen.width / 8;
+    this.sprite.width = spriteSize;
+    this.sprite.height = spriteSize;
 
     this.addChild(this.sprite);
+    this.displayArea = origin.screen;
+
+    this.TOP_LIMIT = 0;
+    this.BOTTOM_LIMIT = this.displayArea.height - this.height;
+    this.LEFT_LIMIT = 0;
+    this.RIGHT_LIMIT = this.displayArea.width - this.width;
+  }
+
+  bounceCheck() {
+    if (this.position.x <= this.LEFT_LIMIT) return 'LEFT';
+    if (this.position.x >= this.RIGHT_LIMIT) return 'RIGHT';
+    if (this.position.y <= this.TOP_LIMIT) return 'TOP';
+    if (this.position.y >= this.BOTTOM_LIMIT) return 'BOTTOM';
+    return false;
+  }
+
+  bounce(bound) {
+    switch (bound) {
+      case 'LEFT':
+        this.position.x = 0;
+        this.velocity.x *= -1;
+        break;
+      case 'RIGHT':
+        this.position.x = this.RIGHT_LIMIT;
+        this.velocity.x *= -1;
+        break;
+      case 'TOP':
+        this.position.y = 0;
+        this.velocity.y *= -1;
+        break;
+      case 'BOTTOM':
+        this.position.y = this.BOTTOM_LIMIT;
+        this.velocity.y *= -1;
+        break;
+      default:
+        break;
+    }
   }
 
   update(delta) {
-    this.sprite.position.x += this.velocity * delta;
-    this.sprite.position.y += this.velocity * delta;
+    this.position.x += this.velocity.x * delta;
+    this.position.y += this.velocity.y * delta;
+    const isBouncingOnAxis = this.bounceCheck();
+    if (isBouncingOnAxis) {
+      this.bounce(isBouncingOnAxis);
+    }
   }
 }
