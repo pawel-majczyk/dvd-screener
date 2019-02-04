@@ -1,4 +1,5 @@
 import * as PIXI from 'pixi.js';
+// import { ColorMatrixFilter } from 'pixi-filters';
 import logo from '../../assets/dvd-logo.png';
 
 export default class Bouncer extends PIXI.Container {
@@ -6,8 +7,8 @@ export default class Bouncer extends PIXI.Container {
     super(options);
 
     this.velocity = {
-      x: 2,
-      y: 2,
+      x: 4,
+      y: 4,
     };
 
     this.sprite = PIXI.Sprite.from(logo);
@@ -22,6 +23,12 @@ export default class Bouncer extends PIXI.Container {
     this.BOTTOM_LIMIT = this.displayArea.height - this.height;
     this.LEFT_LIMIT = 0;
     this.RIGHT_LIMIT = this.displayArea.width - this.width;
+
+    this.currentColor = 0; // R:0 G:120 B:240;
+    this.nextColor = 120;
+    this.replaceRedFilter = new PIXI.filters.ColorMatrixFilter();
+    this.sprite.filters = [this.replaceRedFilter];
+    this.replaceRedFilter.hue(this.currentColor, false);
   }
 
   bounceCheck() {
@@ -55,12 +62,25 @@ export default class Bouncer extends PIXI.Container {
     }
   }
 
+  changeColor() {
+    this.replaceRedFilter.hue(this.currentColor);
+    setTimeout(() => {
+      if (this.currentColor < this.nextColor) {
+        this.currentColor += 1;
+        this.changeColor();
+      } else {
+        this.nextColor = this.nextColor + 120;
+      }
+    }, 5);
+  }
+
   update(delta) {
     this.position.x += this.velocity.x * delta;
     this.position.y += this.velocity.y * delta;
     const isBouncingOnAxis = this.bounceCheck();
     if (isBouncingOnAxis) {
       this.bounce(isBouncingOnAxis);
+      this.changeColor(this.nextColor);
     }
   }
 }

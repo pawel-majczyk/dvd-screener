@@ -24,6 +24,7 @@
   },
   "dependencies": {
     "@types/three": "^0.93.15",
+    "pixi-filters": "^2.7.0",
     "pixi.js": "^4.8.5",
     "three": "^0.100.0",
     "vue": "^2.5.21",

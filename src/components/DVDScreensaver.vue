@@ -19,18 +19,15 @@ export default {
       view,
       width,
       height,
-      // PIXI.settings.RESOLUTIOn
-      // width: 128 + 128 * Math.floor(width / 128),
-      // height: 128 + 128 * Math.floor(height / 128),
       backgroundColor: 0x111b16,
       antialias: true,
     });
   },
   updated() {
     const { width, height } = this.$refs.view.getBoundingClientRect();
-    console.log('i[dated');
+    console.log('updated');
 
-    this.game.setSize({ width, height });
+    this.game.setSize({ width, height }); // TODO
   },
   destroyed() {
     this.game.destroy();
