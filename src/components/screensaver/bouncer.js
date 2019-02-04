@@ -6,13 +6,8 @@ export default class Bouncer extends PIXI.Container {
   constructor(origin, options) {
     super(options);
 
-    this.velocity = {
-      x: 4,
-      y: 4,
-    };
-
     this.sprite = PIXI.Sprite.from(logo);
-    const spriteSize = origin.screen.width / 8;
+    const spriteSize = origin.screen.width / 6;
     this.sprite.width = spriteSize;
     this.sprite.height = spriteSize;
 
@@ -29,6 +24,15 @@ export default class Bouncer extends PIXI.Container {
     this.replaceRedFilter = new PIXI.filters.ColorMatrixFilter();
     this.sprite.filters = [this.replaceRedFilter];
     this.replaceRedFilter.hue(this.currentColor, false);
+
+    this.position = {
+      x: Math.floor(Math.random() * this.displayArea.width),
+      y: Math.floor(Math.random() * this.displayArea.height),
+    };
+    this.velocity = {
+      x: 1,
+      y: 1,
+    };
   }
 
   bounceCheck() {
@@ -66,12 +70,16 @@ export default class Bouncer extends PIXI.Container {
     this.replaceRedFilter.hue(this.currentColor);
     setTimeout(() => {
       if (this.currentColor < this.nextColor) {
-        this.currentColor += 1;
+        this.currentColor += 2;
         this.changeColor();
       } else {
         this.nextColor = this.nextColor + 120;
+        if (this.nextColor === 480) {
+          this.nextColor = 120;
+          this.currentColor = 0;
+        }
       }
-    }, 5);
+    }, 10);
   }
 
   update(delta) {
