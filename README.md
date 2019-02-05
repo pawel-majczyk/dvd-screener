@@ -1,15 +1,17 @@
-# dvd-screener
-In future, there will be working version of common DVD Screensaver
 
-Should be a great resource on daily meetings/talks that get out of hand.
+## DVD Screensaver
+#### A colorful addition to the daily meetings inspired by THE OFFICE TV Show
+---
+This simple app should provide a lot of entertaiment during routine talks.
+Inspired by [THE OFFICE scene](https://www.youtube.com/watch?v=QOtuX0jL85Y)
 
-Inspiration: https://www.youtube.com/watch?v=QOtuX0jL85Y
-
-### links
+### LIVE previews
 
 + https://pawel-majczyk.github.io/dvd-screener/#/
 + https://pawel-majczyk.github.io/dvd-screener/#/three (3D playground)
 
+---
+### Generic stuff below
 
 ## Project setup
 ```
