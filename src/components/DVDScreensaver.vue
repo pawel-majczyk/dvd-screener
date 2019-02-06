@@ -1,5 +1,6 @@
 <template>
   <canvas
+    class="dvd"
     ref="view"
   />
 </template>
@@ -22,12 +23,9 @@ export default {
       backgroundColor: 0x111b16,
       antialias: true,
     });
-  },
-  updated() {
-    const { width, height } = this.$refs.view.getBoundingClientRect();
-    console.log('updated');
-
-    this.game.setSize({ width, height }); // TODO
+    document.addEventListener('click', () => {
+      document.body.requestPointerLock();
+    });
   },
   destroyed() {
     this.game.destroy();
@@ -37,7 +35,7 @@ export default {
 </script>
 
 <style>
-canvas {
+.dvd {
   box-sizing: border-box;
   display: block;
   margin: 0 auto;
