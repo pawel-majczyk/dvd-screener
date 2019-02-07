@@ -7,8 +7,8 @@ export default class Bouncer extends PIXI.Container {
     super(options);
 
     this.sprite = PIXI.Sprite.from(logo);
-    this.sprite.width = origin.screen.width / 6;
-    this.sprite.height = origin.screen.width / 6;
+    this.sprite.width = origin.screen.width / 8;
+    this.sprite.height = origin.screen.width / 8;
 
     this.addChild(this.sprite);
     this.displayArea = origin.screen;
