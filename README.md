@@ -3,6 +3,7 @@
 #### A colorful addition to the daily meetings inspired by THE OFFICE TV Show
 ---
 This simple app should provide a lot of entertaiment during routine talks.
+
 Inspired by [THE OFFICE scene](https://www.youtube.com/watch?v=QOtuX0jL85Y)
 
 ### LIVE previews
