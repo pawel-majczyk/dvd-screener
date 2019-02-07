@@ -1,5 +1,5 @@
 module.exports = {
-  baseUrl: undefined,
+  baseUrl: '/dvd-screener/',
   outputDir: undefined,
   assetsDir: 'assets',
   runtimeCompiler: undefined,
