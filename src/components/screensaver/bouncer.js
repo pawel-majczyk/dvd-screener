@@ -1,93 +1,110 @@
 import * as PIXI from 'pixi.js';
-// import { ColorMatrixFilter } from 'pixi-filters';
 import logo from '../../assets/dvd-logo.png';
+import {
+  HORIZONTAL_VELOCITY,
+  VERTICAL_VELOCITY,
+  SPRITE_SIZE_FACTOR,
+  COLOR_CHANGE_SPEED,
+} from './constants';
 
 export default class Bouncer extends PIXI.Container {
-  constructor(origin, options) {
+  constructor(displayArea, options) {
     super(options);
+    this.state = {
+      velocity: {
+        x: HORIZONTAL_VELOCITY,
+        y: VERTICAL_VELOCITY,
+      },
+      // position: {}, // container has own position property
+      screen: displayArea,
+      isBouncing: false,
+      color: {
+        list: [0, 120, 240, 360], // R:0 G:120 B:240;
+        current: 0,
+        nextIndex: 1,
+        isChanging: false,
+      },
+    };
 
     this.sprite = PIXI.Sprite.from(logo);
-    this.sprite.width = origin.screen.width / 8;
-    this.sprite.height = origin.screen.width / 8;
-
+    this.sprite.width = this.state.screen.width * SPRITE_SIZE_FACTOR;
+    this.sprite.height = this.state.screen.width * SPRITE_SIZE_FACTOR;
     this.addChild(this.sprite);
-    this.displayArea = origin.screen;
 
-    this.TOP_LIMIT = 0;
-    this.BOTTOM_LIMIT = this.displayArea.height - this.height;
-    this.LEFT_LIMIT = 0;
-    this.RIGHT_LIMIT = this.displayArea.width - this.width;
-
-    this.currentColor = 0; // R:0 G:120 B:240;
-    this.nextColor = 120;
     this.replaceRedFilter = new PIXI.filters.ColorMatrixFilter();
     this.sprite.filters = [this.replaceRedFilter];
-    this.replaceRedFilter.hue(this.currentColor, false);
+    this.replaceRedFilter.hue(this.state.color.current);
 
-    this.position = {
-      x: Math.floor(Math.random() * this.displayArea.width),
-      y: Math.floor(Math.random() * this.displayArea.height),
-    };
-    this.velocity = {
-      x: 2,
-      y: 2,
-    };
+    this.setStartingPosition();
   }
 
-  bounceCheck() {
-    if (this.position.x <= this.LEFT_LIMIT) return 'LEFT';
-    if (this.position.x >= this.RIGHT_LIMIT) return 'RIGHT';
-    if (this.position.y <= this.TOP_LIMIT) return 'TOP';
-    if (this.position.y >= this.BOTTOM_LIMIT) return 'BOTTOM';
-    return false;
+  setStartingPosition() {
+    this.position.x = Math.floor(Math.random()
+      * (this.state.screen.width - this.sprite.width));
+    this.position.y = Math.floor(Math.random()
+      * (this.state.screen.height - this.sprite.height));
   }
 
-  bounce(bound) {
-    switch (bound) {
-      case 'LEFT':
-        this.position.x = 0;
-        this.velocity.x *= -1;
-        break;
-      case 'RIGHT':
-        this.position.x = this.RIGHT_LIMIT;
-        this.velocity.x *= -1;
-        break;
-      case 'TOP':
-        this.position.y = 0;
-        this.velocity.y *= -1;
-        break;
-      case 'BOTTOM':
-        this.position.y = this.BOTTOM_LIMIT;
-        this.velocity.y *= -1;
-        break;
-      default:
-        break;
+  updatePosition(delta) {
+    this.position.x += this.state.velocity.x * delta;
+    this.position.y += this.state.velocity.y * delta;
+    this.bounceCheck();
+  }
+
+  bounceCheck() { // to refactor
+    const { position, sprite } = this;
+    const { screen } = this.state;
+    let bounceAxis = false;
+    if (position.x < screen.x) { // bounce left
+      position.x = 0;
+      bounceAxis = 'x';
     }
+    if (position.x > screen.width - sprite.width) { // bounce right
+      position.x = screen.width - sprite.width;
+      bounceAxis = 'x';
+    }
+    if (position.y < screen.y) { // bounce top
+      bounceAxis = 'y';
+      position.y = 0;
+    }
+    if (position.y > screen.height - sprite.height) { // bounce bottom
+      bounceAxis = 'y';
+      position.y = screen.height - sprite.height;
+    }
+    if (bounceAxis) {
+      this.changeVelocity(bounceAxis, -1);
+      this.changeColor();
+    }
+  }
+
+  changeVelocity(axis, speed) {
+    this.state.velocity[axis] = this.state.velocity[axis] * speed;
   }
 
   changeColor() {
-    this.replaceRedFilter.hue(this.currentColor);
-    setTimeout(() => {
-      if (this.currentColor < this.nextColor) {
-        this.currentColor += 4;
+    const { color } = this.state;
+    color.isChanging = true;
+
+    if (color.current
+      < color.list[color.nextIndex]) {
+      color.current += COLOR_CHANGE_SPEED;
+
+      this.replaceRedFilter.hue(color.current);
+
+      setTimeout(() => {
         this.changeColor();
-      } else {
-        this.nextColor = this.nextColor + 120;
-        if (this.nextColor === 480) {
-          this.nextColor = 120;
-          this.currentColor = 0;
-        }
+      }, 10);
+    } else {
+      if (color.nextIndex === color.list.length - 1) {
+        color.current = 0;
+        color.nextIndex = 0;
       }
-    }, 10);
+      color.nextIndex += 1;
+      color.isChanging = false;
+    }
   }
 
   update(delta) {
-    this.position.x += this.velocity.x * delta;
-    this.position.y += this.velocity.y * delta;
-    const isBouncingOnAxis = this.bounceCheck();
-    if (isBouncingOnAxis) {
-      this.bounce(isBouncingOnAxis);
-      this.changeColor(this.nextColor);
-    }
+    this.updatePosition(delta);
   }
 }

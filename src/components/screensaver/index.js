@@ -6,12 +6,11 @@ export default class Screensaver extends PIXI.Application {
     super(options);
     this.renderer.autoResize = true;
     this.ticker.add(this.update, this);
-    const bouncer = new Bouncer(this);
+    const bouncer = new Bouncer(this.screen);
 
     this.stage.addChild(bouncer);
   }
 
-  // eslint-disable-next-line
   update(delta) {
     this.stage.children.forEach(child => child.update(delta));
   }
