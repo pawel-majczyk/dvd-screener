@@ -26,6 +26,9 @@ export default {
     document.addEventListener('click', () => {
       document.body.requestPointerLock();
     });
+    window.addEventListener('resize', () => {
+      this.game.newSize(window.innerWidth, window.innerHeight);
+    });
   },
   destroyed() {
     this.game.destroy();
@@ -40,6 +43,6 @@ export default {
   display: block;
   margin: 0 auto;
   width: 100%;
-  height: 100vh;
+  height: 100%;
 }
 </style>

@@ -7,8 +7,12 @@ export default class Screensaver extends PIXI.Application {
     this.renderer.autoResize = true;
     this.ticker.add(this.update, this);
     const bouncer = new Bouncer(this.screen);
-
     this.stage.addChild(bouncer);
+  }
+
+  newSize(width, height) {
+    this.renderer.resize(width, height);
+    this.stage.children.forEach(child => child.setNewSize(width));
   }
 
   update(delta) {

@@ -51,6 +51,11 @@ export default class Bouncer extends PIXI.Container {
     this.bounceCheck();
   }
 
+  setNewSize(width) {
+    this.sprite.width = width * SPRITE_SIZE_FACTOR;
+    this.sprite.height = width * SPRITE_SIZE_FACTOR;
+  }
+
   bounceCheck() { // to refactor
     const { position, sprite } = this;
     const { screen } = this.state;
